@@ -31,7 +31,7 @@ jobs:
         id: semantic
         uses: cycjimmy/semantic-release-action@v4
         with:
-          dry_run: true
+          dry_run: false
           semantic_version: 21
           extra_plugins: |
             @semantic-release/changelog
@@ -123,7 +123,7 @@ jobs:
     name: Semantic Release Images and Artifacts
     runs-on: ubuntu-20.04
     needs: [ refs, build, merge ]
-    if: always() && needs.refs.outputs.new_release == 'false' && (github.ref == 'refs/heads/main' || github.ref_name == 'alpha')
+    if: always() && needs.refs.outputs.new_release == 'true' && (github.ref == 'refs/heads/main' || github.ref_name == 'alpha')
     steps:
       - name: Source checkout
         uses: actions/checkout@v4
