@@ -115,7 +115,7 @@ jobs:
           - name: Merge Artifacts
             uses: actions/upload-artifact/merge@v4
             with:
-              name: ${{ env.APP_NAME }}_${{ needs.refs.outputs.version }}
+              name: ${{ env.APP_NAME }}_${{ needs.refs.outputs.version }}-ubuntu-20.04
               delete-merged: true
 
   release:
