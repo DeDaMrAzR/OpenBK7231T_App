@@ -266,51 +266,65 @@ release:
       uses: actions/download-artifact@v4
       with:
         name: ${{ env.APP_NAME }}_${{ needs.refs.outputs.version }}_OpenBK7231T
-        path: output/${{ needs.refs.outputs.version }}/OpenBK7231T
+        path: temp_files/
     
     - name: Download OpenBK7231N artifacts
       uses: actions/download-artifact@v4
       with:
         name: ${{ env.APP_NAME }}_${{ needs.refs.outputs.version }}_OpenBK7231N
-        path: output/${{ needs.refs.outputs.version }}/OpenBK7231N
+        path: temp_files/
 
     - name: Download OpenBK7231N artifacts
       uses: actions/download-artifact@v4
       with:
         name: ${{ env.APP_NAME }}_${{ needs.refs.outputs.version }}_OpenXR809
-        path: output/${{ needs.refs.outputs.version }}/OpenXR809
+        path: temp_files/
 
     - name: Download OpenBK7231N artifacts
       uses: actions/download-artifact@v4
       with:
         name: ${{ env.APP_NAME }}_${{ needs.refs.outputs.version }}_OpenBL602
-        path: output/${{ needs.refs.outputs.version }}/OpenBL602
+        path: temp_files/
 
     - name: Download OpenBK7231N artifacts
       uses: actions/download-artifact@v4
       with:
         name: ${{ env.APP_NAME }}_${{ needs.refs.outputs.version }}_OpenW800
-        path: output/${{ needs.refs.outputs.version }}/OpenW800
+        path: temp_files/
 
     - name: Download OpenBK7231N artifacts
       uses: actions/download-artifact@v4
       with:
         name: ${{ env.APP_NAME }}_${{ needs.refs.outputs.version }}_OpenW600
-        path: output/${{ needs.refs.outputs.version }}/OpenW600
+        path: temp_files/
 
     - name: Download OpenBK7231N artifacts
       uses: actions/download-artifact@v4
       with:
         name: ${{ env.APP_NAME }}_${{ needs.refs.outputs.version }}_OpenLN882H
-        path: output/${{ needs.refs.outputs.version }}/OpenLN882H
+        path: temp_files/
 
     # Add more download steps for other platforms as needed
 
-    # Combine all artifacts into one zip file
+    # Move all platform files into a single directory
+    - name: Move all artifacts into a single folder
+      run: |
+        mkdir -p output/all_platforms
+        mv temp_files/** output/all_platforms/
+
+   # Compress all files into a single zip file without nesting archives
     - name: Create a single zip file for all platforms
       run: |
-        cd output/${{ needs.refs.outputs.version }}
-        zip -r ${{ env.APP_NAME }}_${{ needs.refs.outputs.version }}.zip OpenBK7231T OpenBK7231N OpenXR809 OpenBL602 OpenW800 OpenW600 OpenLN882H # Add other platform folders as needed
+        cd output/all_platforms
+        zip -r ${{ env.APP_NAME }}_${{ needs.refs.outputs.version }}_all_platforms.zip *
+
+    # Upload the zip file containing all platform files
+    - name: Upload all-platforms zip
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ env.APP_NAME }}_${{ needs.refs.outputs.version }}_all_platforms
+        path: output/all_platforms/${{ env.APP_NAME }}_${{ needs.refs.outputs.version }}_all_platforms.zip
+        
       - name: Run Semantic Release
         id: semantic
         uses: cycjimmy/semantic-release-action@v4
