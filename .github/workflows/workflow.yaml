@@ -312,35 +312,38 @@ release:
         mkdir -p output/all_platforms
         mv temp_files/** output/all_platforms/
 
-   # Compress all files into a single zip file without nesting archives
+    # Compress all files into a single zip file without nesting archives
     - name: Create a single zip file for all platforms
       run: |
         cd output/all_platforms
         zip -r ${{ env.APP_NAME }}_${{ needs.refs.outputs.version }}_all_platforms.zip *
 
-  
+    # Upload the zip file containing all platform files
     - name: Upload all-platforms zip
       uses: actions/upload-artifact@v4
       with:
         name: ${{ env.APP_NAME }}_${{ needs.refs.outputs.version }}_all_platforms
         path: output/all_platforms/${{ env.APP_NAME }}_${{ needs.refs.outputs.version }}_all_platforms.zip
-        
-      - name: Run Semantic Release
-        id: semantic
-        uses: cycjimmy/semantic-release-action@v4
-        with:
-          dry_run: false
-          semantic_version: 21
-          extra_plugins: |
-            @semantic-release/changelog
-            @semantic-release/git
-            conventional-changelog-conventionalcommits@7
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Echo Semantic Release Versions
-        if: steps.semantic.outputs.new_release_published == 'true'
-        run: |
-          echo ${{ steps.semantic.outputs.new_release_version }}
-          echo ${{ steps.semantic.outputs.new_release_major_version }}
-          echo ${{ steps.semantic.outputs.new_release_minor_version }}
-          echo ${{ steps.semantic.outputs.new_release_patch_version }}
+
+    # Run Semantic Release
+    - name: Run Semantic Release
+      id: semantic
+      uses: cycjimmy/semantic-release-action@v4
+      with:
+        dry_run: false
+        semantic_version: 21
+        extra_plugins: |
+          @semantic-release/changelog
+          @semantic-release/git
+          conventional-changelog-conventionalcommits@7
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    # Output the new release version details
+    - name: Echo Semantic Release Versions
+      if: steps.semantic.outputs.new_release_published == 'true'
+      run: |
+        echo ${{ steps.semantic.outputs.new_release_version }}
+        echo ${{ steps.semantic.outputs.new_release_major_version }}
+        echo ${{ steps.semantic.outputs.new_release_minor_version }}
+        echo ${{ steps.semantic.outputs.new_release_patch_version }}
