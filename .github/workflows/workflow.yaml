@@ -318,7 +318,7 @@ release:
         cd output/all_platforms
         zip -r ${{ env.APP_NAME }}_${{ needs.refs.outputs.version }}_all_platforms.zip *
 
-    # Upload the zip file containing all platform files
+   # Upload the zip file containing all platform files
     - name: Upload all-platforms zip
       uses: actions/upload-artifact@v4
       with:
