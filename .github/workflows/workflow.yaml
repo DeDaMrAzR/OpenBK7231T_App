@@ -161,9 +161,10 @@ jobs:
       - name: Fetch build assets
         uses: actions/download-artifact@v4
         with:
-          pattern: ${{ env.APP_NAME }}_${{ needs.refs.outputs.version }}*
+          pattern: ${{ env.APP_NAME }}_${{ needs.refs.outputs.version }}-*
           merge-multiple: true
           path: output/${{ needs.refs.outputs.version }}
+          overwrite: true
       - name: Run Semantic Release
         id: semantic
         uses: cycjimmy/semantic-release-action@v4
