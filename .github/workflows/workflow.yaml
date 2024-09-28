@@ -125,46 +125,39 @@ jobs:
           pip3 install configobj
           pip3 install toml
           pip3 install fdt
-      - run: ls -la
       - name: Run make
         run: make APP_VERSION=${{ needs.refs.outputs.version }} APP_NAME=${{ matrix.platform }} ${{ matrix.platform }}
+      - name: Copy build assets to a common folder
+        run: |
+          mkdir -p output/${{ needs.refs.outputs.version }}/all_platforms
+          cp output/${{ needs.refs.outputs.version }}/*.bin output/${{ needs.refs.outputs.version }}/all_platforms/
+          cp output/${{ needs.refs.outputs.version }}/*.img output/${{ needs.refs.outputs.version }}/all_platforms/
+          cp output/${{ needs.refs.outputs.version }}/*.rbl output/${{ needs.refs.outputs.version }}/all_platforms/
+          cp output/${{ needs.refs.outputs.version }}/*.fls output/${{ needs.refs.outputs.version }}/all_platforms/
       - name: Save build assets
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.APP_NAME }}_${{ needs.refs.outputs.version }}_${{ matrix.platform }}
-          path: |
-            output/${{ needs.refs.outputs.version }}/OpenBK7231T_UA_${{ needs.refs.outputs.version }}.bin
-            output/${{ needs.refs.outputs.version }}/OpenBK7231T_UG_${{ needs.refs.outputs.version }}.bin
-            output/${{ needs.refs.outputs.version }}/OpenBK7231T_QIO_${{ needs.refs.outputs.version }}.bin
-            output/${{ needs.refs.outputs.version }}/OpenBK7231N_QIO_${{ needs.refs.outputs.version }}.bin
-            output/${{ needs.refs.outputs.version }}/OpenBK7231N_UG_${{ needs.refs.outputs.version }}.bin
-            output/${{ needs.refs.outputs.version }}/OpenBK7231M_QIO_${{ needs.refs.outputs.version }}.bin
-            output/${{ needs.refs.outputs.version }}/${{ matrix.platform }}_${{ needs.refs.outputs.version }}.rbl
-            output/${{ needs.refs.outputs.version }}/${{ matrix.platform }}_${{ needs.refs.outputs.version }}.img
-            output/${{ needs.refs.outputs.version }}/${{ matrix.platform }}_${{ needs.refs.outputs.version }}.bin
-            output/${{ needs.refs.outputs.version }}/${{ matrix.platform }}_${{ needs.refs.outputs.version }}.fls
-            output/${{ needs.refs.outputs.version }}/${{ matrix.platform }}_${{ needs.refs.outputs.version }}_ota.img
-            output/${{ needs.refs.outputs.version }}/${{ matrix.platform }}_${{ needs.refs.outputs.version }}_gz.img
-            output/${{ needs.refs.outputs.version }}/${{ matrix.platform }}_${{ needs.refs.outputs.version }}_OTA.bin      
-            output/${{ needs.refs.outputs.version }}/${{ matrix.platform }}_${{ needs.refs.outputs.version }}_OTA.bin.xz            
-            output/${{ needs.refs.outputs.version }}/${{ matrix.platform }}_${{ needs.refs.outputs.version }}_OTA.bin.xz.ota
+          name: ${{ env.APP_NAME }}_${{ needs.refs.outputs.version }}_all_platforms
+          path: output/${{ needs.refs.outputs.version }}/all_platforms
           if-no-files-found: warn
-      
+
   release:
     name: Semantic Release Images and Artifacts
     runs-on: ubuntu-20.04
-    needs: [ refs, build ]
+    needs: [refs, build]
     if: always() && needs.refs.outputs.new_release == 'true' && (github.ref == 'refs/heads/main' || github.ref_name == 'alpha')
     steps:
       - name: Source checkout
         uses: actions/checkout@v4
-      - name: Fetch build assets
+      - name: Download all platform assets
         uses: actions/download-artifact@v4
         with:
-          name: ${{ env.APP_NAME }}_${{ needs.refs.outputs.version }}
-          path: output/${{ needs.refs.outputs.version }}
-          pattern: ${{ env.APP_NAME }}_${{ needs.refs.outputs.version }}_*
-          merge-multiple: true
+          name: ${{ env.APP_NAME }}_${{ needs.refs.outputs.version }}_all_platforms
+          path: output/${{ needs.refs.outputs.version }}/
+      - name: Compress all build assets into a single archive
+        run: |
+          cd output/${{ needs.refs.outputs.version }}
+          zip -r ${APP_NAME}_${{ needs.refs.outputs.version }}_all_platforms.zip all_platforms
       - name: Run Semantic Release
         id: semantic
         uses: cycjimmy/semantic-release-action@v4
