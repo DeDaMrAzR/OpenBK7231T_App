@@ -143,56 +143,56 @@ jobs:
           name: ${{ env.APP_NAME }}_${{ needs.refs.outputs.version }}_${{ matrix.platform }}
           path: output/${{ needs.refs.outputs.version }}/
 
-release:
-  name: Semantic Release Images and Artifacts
-  runs-on: ubuntu-20.04
-  needs: [refs, build]
-  if: always() && needs.refs.outputs.new_release == 'true' && (github.ref == 'refs/heads/main' || github.ref_name == 'alpha')
-
-  steps:
-    - name: Source checkout
-      uses: actions/checkout@v4
-
-    # Download and organize artifacts for each platform
-    - name: Download all platform artifacts
-      uses: actions/download-artifact@v4
-      with:
-        path: temp_files/
-      continue-on-error: true
-
-    - name: Move all artifacts into a single folder
-      run: |
-        mkdir -p output/all_platforms
-        mv temp_files/** output/all_platforms/
-
-    - name: Compress all files into a single zip file without nesting
-      run: |
-        cd output/all_platforms
-        zip -r ${{ env.APP_NAME }}_${{ needs.refs.outputs.version }}_all_platforms.zip *
-
-    - name: Upload all-platforms zip
-      uses: actions/upload-artifact@v4
-      with:
-        name: ${{ env.APP_NAME }}_${{ needs.refs.outputs.version }}_all_platforms
-        path: output/all_platforms/${{ env.APP_NAME }}_${{ needs.refs.outputs.version }}_all_platforms.zip
-
-    - name: Run Semantic Release
-      id: semantic
-      uses: cycjimmy/semantic-release-action@v4
-      with:
-        dry_run: false
-        semantic_version: 21
-        extra_plugins: |
-          @semantic-release/changelog
-          @semantic-release/git
-          conventional-changelog-conventionalcommits@7
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-    - name: Echo Semantic Release Versions
-      if: steps.semantic.outputs.new_release_published == 'true'
-      run: |
-        echo ${{ steps.semantic.outputs.new_release_version }}
-        echo ${{ steps.semantic.outputs.new_release_major_version }}
-        echo ${{ steps.semantic.outputs.new_release_minor_version }}
-        echo ${{ steps.semantic.outputs.new_release_patch_version }}
+  release:
+    name: Semantic Release Images and Artifacts
+    runs-on: ubuntu-20.04
+    needs: [refs, build]
+    if: always() && needs.refs.outputs.new_release == 'true' && (github.ref == 'refs/heads/main' || github.ref_name == 'alpha')
+  
+    steps:
+      - name: Source checkout
+        uses: actions/checkout@v4
+  
+      # Download and organize artifacts for each platform
+      - name: Download all platform artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: temp_files/
+        continue-on-error: true
+  
+      - name: Move all artifacts into a single folder
+        run: |
+          mkdir -p output/all_platforms
+          mv temp_files/** output/all_platforms/
+  
+      - name: Compress all files into a single zip file without nesting
+        run: |
+          cd output/all_platforms
+          zip -r ${{ env.APP_NAME }}_${{ needs.refs.outputs.version }}_all_platforms.zip *
+  
+      - name: Upload all-platforms zip
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.APP_NAME }}_${{ needs.refs.outputs.version }}_all_platforms
+          path: output/all_platforms/${{ env.APP_NAME }}_${{ needs.refs.outputs.version }}_all_platforms.zip
+  
+      - name: Run Semantic Release
+        id: semantic
+        uses: cycjimmy/semantic-release-action@v4
+        with:
+          dry_run: false
+          semantic_version: 21
+          extra_plugins: |
+            @semantic-release/changelog
+            @semantic-release/git
+            conventional-changelog-conventionalcommits@7
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  
+      - name: Echo Semantic Release Versions
+        if: steps.semantic.outputs.new_release_published == 'true'
+        run: |
+          echo ${{ steps.semantic.outputs.new_release_version }}
+          echo ${{ steps.semantic.outputs.new_release_major_version }}
+          echo ${{ steps.semantic.outputs.new_release_minor_version }}
+          echo ${{ steps.semantic.outputs.new_release_patch_version }}
