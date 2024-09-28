@@ -132,6 +132,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.APP_NAME }}_${{ needs.refs.outputs.version }}
+          merge-multiple: true
           path: |
             output/${{ needs.refs.outputs.version }}/OpenBK7231T_UA_${{ needs.refs.outputs.version }}.bin
             output/${{ needs.refs.outputs.version }}/OpenBK7231T_UG_${{ needs.refs.outputs.version }}.bin
@@ -162,7 +163,6 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: ${{ env.APP_NAME }}_${{ needs.refs.outputs.version }}
-          merge-multiple: true
           path: output/${{ needs.refs.outputs.version }}
       - name: Run Semantic Release
         id: semantic
