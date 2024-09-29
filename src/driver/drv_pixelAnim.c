@@ -14,7 +14,8 @@
 /*
 // Usage:
 startDriver SM16703P
-SM16703P_Init 16
+SM16703P_Init <number of LED's> <RGB chennels map>
+SM16703P_Init 10 GRB => 10 LED's and Green. Red, Blue for color channels
 startDriver PixelAnim
 
 */
@@ -107,7 +108,7 @@ void Fire_setPixelHeatColor(int Pixel, byte temperature) {
 // FlameHeight - Use larger value for shorter flames, default=50.
 // Sparks - Use larger value for more ignitions and a more active fire (between 0 to 255), default=100.
 // DelayDuration - Use larger value for slower flame speed, default=10.
-int FlameHeight = 50;
+int FlameHeight = 100;
 int Sparks = 100;
 static byte *pix_workBuffer = 0;
 static int pix_workBufferSize = 0;
