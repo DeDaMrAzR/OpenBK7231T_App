@@ -148,17 +148,18 @@ jobs:
                       output/${{ needs.refs.outputs.version }}/${{ matrix.platform }}_${{ needs.refs.outputs.version }}_OTA.bin      
                       output/${{ needs.refs.outputs.version }}/${{ matrix.platform }}_${{ needs.refs.outputs.version }}_OTA.bin.xz            
                       output/${{ needs.refs.outputs.version }}/${{ matrix.platform }}_${{ needs.refs.outputs.version }}_OTA.bin.xz.ota
+                  compression-level: 0  # Disables compression
                   if-no-files-found: warn
-  merge:
-      runs-on: ubuntu-20.04
-      needs: [refs, build]
-      steps:
-          - name: Merge Artifacts
-            uses: actions/upload-artifact/merge@v4
-            with:
-              name: ${{ env.APP_NAME }}_${{ needs.refs.outputs.version }}
-              pattern: "output/${{ needs.refs.outputs.version }}/*.zip"
-              delete-merged: true
+  #merge:
+  #    runs-on: ubuntu-20.04
+  #    needs: [refs, build]
+  #    steps:
+  #        - name: Merge Artifacts
+  #          uses: actions/upload-artifact/merge@v4
+  #          with:
+  #            name: ${{ env.APP_NAME }}_${{ needs.refs.outputs.version }}
+  #            pattern: output/${{ needs.refs.outputs.version }}
+  #            delete-merged: true
   
   release:
         name: Semantic Release Images and Artifacts
