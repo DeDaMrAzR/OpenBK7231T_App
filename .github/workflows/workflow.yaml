@@ -271,10 +271,10 @@ jobs:
               name: ${{ env.APP_NAME }}_${{ needs.refs.outputs.version }}
               path: output/${{ needs.refs.outputs.version }}
         
-        - name: Unzip Artifact
-          if: ${{ success() }}
-          run: |
-            unzip -o "output/${{ needs.refs.outputs.version }}/${{ env.APP_NAME }}_${{ needs.refs.outputs.version }}.zip" -d "output/${{ needs.refs.outputs.version }}/"
+#        - name: Unzip Artifact
+#          if: ${{ success() }}
+#          run: |
+#            unzip -o "output/${{ needs.refs.outputs.version }}/${{ env.APP_NAME }}_${{ needs.refs.outputs.version }}.zip" -d "output/${{ needs.refs.outputs.version }}/"
 
         - name: Run Semantic Release
           id: semantic
