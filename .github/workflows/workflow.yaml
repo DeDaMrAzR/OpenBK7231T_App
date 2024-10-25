@@ -151,7 +151,7 @@ jobs:
                   if-no-files-found: warn
   merge:
       runs-on: ubuntu-20.04
-      needs: build
+      needs: [refs, build]
       steps:
           - name: Merge Artifacts
             uses: actions/upload-artifact/merge@v4
