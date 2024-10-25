@@ -6,6 +6,7 @@ on:
   pull_request:
     branches: 
       - '**'
+  workflow_dispatch: # Add this line to allow manual triggering
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
