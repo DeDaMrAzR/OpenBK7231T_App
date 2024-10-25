@@ -6,7 +6,7 @@ on:
   pull_request:
     branches: 
       - '**'
-  workflow_dispatch: # Add this line to allow manual triggering
+ ## workflow_dispatch: # Add this line to allow manual triggering
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -157,7 +157,7 @@ jobs:
             uses: actions/upload-artifact/merge@v4
             with:
               name: ${{ env.APP_NAME }}_${{ needs.refs.outputs.version }}
-              pattern: ${{ needs.refs.outputs.version }}*
+              pattern: "output/${{ needs.refs.outputs.version }}/*.zip"
               delete-merged: true
   
   release:
