@@ -6,6 +6,7 @@ on:
   pull_request:
     branches: 
       - '**'
+  workflow_dispatch: # Add this line to allow manual triggering
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -127,172 +128,67 @@ jobs:
             - run: ls -la
             - name: Run make
               run: make APP_VERSION=${{ needs.refs.outputs.version }} APP_NAME=${{ matrix.platform }} ${{ matrix.platform }}
-            - name: Save build assets - OpenBK7231T_UA
+            - name: Save build assets
               uses: actions/upload-artifact@v4
               with:
-                name: OpenBK7231T_UA_${{ needs.refs.outputs.version }}_${{ matrix.platform }}
-                path: output/${{ needs.refs.outputs.version }}/OpenBK7231T_UA_${{ needs.refs.outputs.version }}.bin
-                compression-level: 0
-                if-no-files-found: warn
-            - name: Save build assets - OpenBK7231T_UG
-              uses: actions/upload-artifact@v4
-              with:
-                name: OpenBK7231T_UG_${{ needs.refs.outputs.version }}_${{ matrix.platform }}
-                path: output/${{ needs.refs.outputs.version }}/OpenBK7231T_UG_${{ needs.refs.outputs.version }}.bin
-                compression-level: 0
-                if-no-files-found: warn
-
-            - name: Save build assets - OpenBK7231T_QIO
-              uses: actions/upload-artifact@v4
-              with:
-                name: OpenBK7231T_QIO_${{ needs.refs.outputs.version }}_${{ matrix.platform }}
-                path: output/${{ needs.refs.outputs.version }}/OpenBK7231T_QIO_${{ needs.refs.outputs.version }}.bin
-                compression-level: 0
-                if-no-files-found: warn
-
-            - name: Save build assets - OpenBK7231N_QIO
-              uses: actions/upload-artifact@v4
-              with:
-                name: OpenBK7231N_QIO_${{ needs.refs.outputs.version }}_${{ matrix.platform }}
-                path: output/${{ needs.refs.outputs.version }}/OpenBK7231N_QIO_${{ needs.refs.outputs.version }}.bin
-                compression-level: 0
-                if-no-files-found: warn
-            
-            - name: Save build assets - OpenBK7231N_UG
-              uses: actions/upload-artifact@v4
-              with:
-                name: OpenBK7231N_UG_${{ needs.refs.outputs.version }}_${{ matrix.platform }}
-                path: output/${{ needs.refs.outputs.version }}/OpenBK7231N_UG_${{ needs.refs.outputs.version }}.bin
-                compression-level: 0
-                if-no-files-found: warn
-            
-            - name: Save build assets - OpenBK7231M_QIO
-              uses: actions/upload-artifact@v4
-              with:
-                name: OpenBK7231M_QIO_${{ needs.refs.outputs.version }}_${{ matrix.platform }}
-                path: output/${{ needs.refs.outputs.version }}/OpenBK7231M_QIO_${{ needs.refs.outputs.version }}.bin
-                compression-level: 0
-                if-no-files-found: warn
-            
-            - name: Save build assets - RBL
-              uses: actions/upload-artifact@v4
-              with:
-                name: RBL_${{ needs.refs.outputs.version }}_${{ matrix.platform }}
-                path: output/${{ needs.refs.outputs.version }}/${{ matrix.platform }}_${{ needs.refs.outputs.version }}.rbl
-                compression-level: 0
-                if-no-files-found: warn
-            
-            - name: Save build assets - IMG
-              uses: actions/upload-artifact@v4
-              with:
-                name: IMG_${{ needs.refs.outputs.version }}_${{ matrix.platform }}
-                path: output/${{ needs.refs.outputs.version }}/${{ matrix.platform }}_${{ needs.refs.outputs.version }}.img
-                compression-level: 0
-                if-no-files-found: warn
-            
-            - name: Save build assets - BIN
-              uses: actions/upload-artifact@v4
-              with:
-                name: BIN_${{ needs.refs.outputs.version }}_${{ matrix.platform }}
-                path: output/${{ needs.refs.outputs.version }}/${{ matrix.platform }}_${{ needs.refs.outputs.version }}.bin
-                compression-level: 0
-                if-no-files-found: warn
-            
-            - name: Save build assets - FLS
-              uses: actions/upload-artifact@v4
-              with:
-                name: FLS_${{ needs.refs.outputs.version }}_${{ matrix.platform }}
-                path: output/${{ needs.refs.outputs.version }}/${{ matrix.platform }}_${{ needs.refs.outputs.version }}.fls
-                compression-level: 0
-                if-no-files-found: warn
-            
-            - name: Save build assets - OTA IMG
-              uses: actions/upload-artifact@v4
-              with:
-                name: OTA_IMG_${{ needs.refs.outputs.version }}_${{ matrix.platform }}
-                path: output/${{ needs.refs.outputs.version }}/${{ matrix.platform }}_${{ needs.refs.outputs.version }}_ota.img
-                compression-level: 0
-                if-no-files-found: warn
-            
-            - name: Save build assets - GZ IMG
-              uses: actions/upload-artifact@v4
-              with:
-                name: GZ_IMG_${{ needs.refs.outputs.version }}_${{ matrix.platform }}
-                path: output/${{ needs.refs.outputs.version }}/${{ matrix.platform }}_${{ needs.refs.outputs.version }}_gz.img
-                compression-level: 0
-                if-no-files-found: warn
-            
-            - name: Save build assets - OTA BIN
-              uses: actions/upload-artifact@v4
-              with:
-                name: OTA_BIN_${{ needs.refs.outputs.version }}_${{ matrix.platform }}
-                path: output/${{ needs.refs.outputs.version }}/${{ matrix.platform }}_${{ needs.refs.outputs.version }}_OTA.bin
-                compression-level: 0
-                if-no-files-found: warn
-            
-            - name: Save build assets - OTA BIN XZ
-              uses: actions/upload-artifact@v4
-              with:
-                name: OTA_BIN_XZ_${{ needs.refs.outputs.version }}_${{ matrix.platform }}
-                path: output/${{ needs.refs.outputs.version }}/${{ matrix.platform }}_${{ needs.refs.outputs.version }}_OTA.bin.xz
-                compression-level: 0
-                if-no-files-found: warn
-            
-            - name: Save build assets - OTA BIN XZ OTA
-              uses: actions/upload-artifact@v4
-              with:
-                name: OTA_BIN_XZ_OTA_${{ needs.refs.outputs.version }}_${{ matrix.platform }}
-                path: output/${{ needs.refs.outputs.version }}/${{ matrix.platform }}_${{ needs.refs.outputs.version }}_OTA.bin.xz.ota
-                compression-level: 0
-                if-no-files-found: warn
-#  merge:
-#      runs-on: ubuntu-20.04
-#      needs: [refs, build]
-#      steps:
-#          - name: Merge Artifacts
-#            uses: actions/upload-artifact/merge@v4
-#            with:
-#              name: ${{ env.APP_NAME }}_${{ needs.refs.outputs.version }}
-#              pattern: output/${{ needs.refs.outputs.version }}
-#              delete-merged: true
+                  name: ${{ env.APP_NAME }}_${{ needs.refs.outputs.version }}_${{ matrix.platform }}
+                  path: |
+                      output/${{ needs.refs.outputs.version }}/OpenBK7231T_UA_${{ needs.refs.outputs.version }}.bin
+                      output/${{ needs.refs.outputs.version }}/OpenBK7231T_UG_${{ needs.refs.outputs.version }}.bin
+                      output/${{ needs.refs.outputs.version }}/OpenBK7231T_QIO_${{ needs.refs.outputs.version }}.bin
+                      output/${{ needs.refs.outputs.version }}/OpenBK7231N_QIO_${{ needs.refs.outputs.version }}.bin
+                      output/${{ needs.refs.outputs.version }}/OpenBK7231N_UG_${{ needs.refs.outputs.version }}.bin
+                      output/${{ needs.refs.outputs.version }}/OpenBK7231M_QIO_${{ needs.refs.outputs.version }}.bin
+                      output/${{ needs.refs.outputs.version }}/${{ matrix.platform }}_${{ needs.refs.outputs.version }}.rbl
+                      output/${{ needs.refs.outputs.version }}/${{ matrix.platform }}_${{ needs.refs.outputs.version }}.img
+                      output/${{ needs.refs.outputs.version }}/${{ matrix.platform }}_${{ needs.refs.outputs.version }}.bin
+                      output/${{ needs.refs.outputs.version }}/${{ matrix.platform }}_${{ needs.refs.outputs.version }}.fls
+                      output/${{ needs.refs.outputs.version }}/${{ matrix.platform }}_${{ needs.refs.outputs.version }}_ota.img
+                      output/${{ needs.refs.outputs.version }}/${{ matrix.platform }}_${{ needs.refs.outputs.version }}_gz.img
+                      output/${{ needs.refs.outputs.version }}/${{ matrix.platform }}_${{ needs.refs.outputs.version }}_OTA.bin      
+                      output/${{ needs.refs.outputs.version }}/${{ matrix.platform }}_${{ needs.refs.outputs.version }}_OTA.bin.xz            
+                      output/${{ needs.refs.outputs.version }}/${{ matrix.platform }}_${{ needs.refs.outputs.version }}_OTA.bin.xz.ota
+                  if-no-files-found: warn
+  merge:
+      runs-on: ubuntu-20.04
+      needs: build
+      steps:
+          - name: Merge Artifacts
+            uses: actions/upload-artifact/merge@v4
+            with:
+              name: ${{ env.APP_NAME }}_${{ needs.refs.outputs.version }}
+              pattern: ${{ needs.refs.outputs.version }}*
+              delete-merged: true
   
   release:
-    name: Semantic Release Images and Artifacts
-    runs-on: ubuntu-20.04
-    needs: [refs, build]
-    if: always() && needs.refs.outputs.new_release == 'true' && (github.ref == 'refs/heads/main' || github.ref_name == 'alpha')
-    steps:
-        - name: Source checkout
-          uses: actions/checkout@v4
-        
-        - name: Fetch build assets
-          uses: actions/download-artifact@v4
-          with:
-              name: ${{ env.APP_NAME }}_${{ needs.refs.outputs.version }}
-              path: output/${{ needs.refs.outputs.version }}
-        
-#        - name: Unzip Artifact
-#          if: ${{ success() }}
-#          run: |
-#            unzip -o "output/${{ needs.refs.outputs.version }}/${{ env.APP_NAME }}_${{ needs.refs.outputs.version }}.zip" -d "output/${{ needs.refs.outputs.version }}/"
-
-        - name: Run Semantic Release
-          id: semantic
-          uses: cycjimmy/semantic-release-action@v4
-          with:
-              dry_run: false
-              semantic_version: 21
-              extra_plugins: |
-                  @semantic-release/changelog
-                  @semantic-release/git
-                  conventional-changelog-conventionalcommits@7
-          env:
-              GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        
-        - name: Echo Semantic Release Versions
-          if: steps.semantic.outputs.new_release_published == 'true'
-          run: |
-              echo ${{ steps.semantic.outputs.new_release_version }}
-              echo ${{ steps.semantic.outputs.new_release_major_version }}
-              echo ${{ steps.semantic.outputs.new_release_minor_version }}
-              echo ${{ steps.semantic.outputs.new_release_patch_version }}
+        name: Semantic Release Images and Artifacts
+        runs-on: ubuntu-20.04
+        needs: [refs, build, merge]
+        if: always() && needs.refs.outputs.new_release == 'true' && (github.ref == 'refs/heads/main' || github.ref_name == 'alpha')
+        steps:
+            - name: Source checkout
+              uses: actions/checkout@v4
+            - name: Fetch build assets
+              uses: actions/download-artifact@v4
+              with:
+                  name: ${{ env.APP_NAME }}_${{ needs.refs.outputs.version }}
+                  path: output/${{ needs.refs.outputs.version }}
+            - name: Run Semantic Release
+              id: semantic
+              uses: cycjimmy/semantic-release-action@v4
+              with:
+                  dry_run: false
+                  semantic_version: 21
+                  extra_plugins: |
+                      @semantic-release/changelog
+                      @semantic-release/git
+                      conventional-changelog-conventionalcommits@7
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            - name: Echo Semantic Release Versions
+              if: steps.semantic.outputs.new_release_published == 'true'
+              run: |
+                  echo ${{ steps.semantic.outputs.new_release_version }}
+                  echo ${{ steps.semantic.outputs.new_release_major_version }}
+                  echo ${{ steps.semantic.outputs.new_release_minor_version }}
+                  echo ${{ steps.semantic.outputs.new_release_patch_version }}
