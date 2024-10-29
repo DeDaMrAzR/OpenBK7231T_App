@@ -157,7 +157,6 @@ jobs:
             uses: actions/upload-artifact/merge@v4
             with:
               name: ${{ env.APP_NAME }}_${{ needs.refs.outputs.version }}
-#              pattern: ${{ env.APP_NAME }}_${{ needs.refs.outputs.version }}_${{ matrix.platform }}
               delete-merged: true
   
   release:
