@@ -97,7 +97,7 @@ jobs:
     - name: Upload build assets
       uses: actions/upload-artifact@v4
       with:
-        name: ${{ env.APP_NAME }}_${{ needs.refs.outputs.version }}
+        name: ${{ env.APP_NAME }}_${{ needs.refs.outputs.version }}_obkSimulator_win32
         path: output/${{ needs.refs.outputs.version }}/obkSimulator_${{ needs.refs.outputs.version }}.zip
   build:
         name: Build
@@ -151,7 +151,7 @@ jobs:
                   if-no-files-found: warn
   merge:
       runs-on: ubuntu-20.04
-      needs: build
+      needs: [build, build2]
       steps:
           - name: Merge Artifacts
             uses: actions/upload-artifact/merge@v4
@@ -163,7 +163,7 @@ jobs:
   release:
         name: Semantic Release Images and Artifacts
         runs-on: ubuntu-20.04
-        needs: [refs, build, merge]
+        needs: [refs, build, build2, merge]
         if: always() && needs.refs.outputs.new_release == 'true' && (github.ref == 'refs/heads/main' || github.ref_name == 'alpha')
         steps:
             - name: Source checkout
