@@ -157,6 +157,7 @@ jobs:
             with:
               name: ${{ env.APP_NAME }}_${{ needs.refs.outputs.version }}
               delete-merged: false
+#             leaving individual artifact archives in
   
   release:
         name: Semantic Release Images and Artifacts
