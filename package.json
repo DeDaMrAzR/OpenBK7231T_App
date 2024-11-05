@@ -1,4 +1,4 @@
-{
+D{
 	"name": "obk-builder",
 	"version": "1.0.0",
 	"description": "Gulp based script content builder",
@@ -9,7 +9,7 @@
 	},
 	"repository": {
 	  "type": "git",
-	  "url": "git+https://github.com/openshwprojects/OpenBK7231T_App.git"
+	  "url": "git+https://github.com/DeDaMrAzR/OpenBK7231T_App.git"
 	},
 	"author": "",
 	"license": "ISC",
