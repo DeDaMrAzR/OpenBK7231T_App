@@ -6,6 +6,7 @@
 #include "../driver/drv_public.h"
 #include <ctype.h>
 #include "cmd_local.h"
+#include "../hal/hal_flashVars.h"
 
 // bit mask telling which channels are hidden from HTTP
 // If given bit is set, then given channel is hidden
@@ -15,6 +16,15 @@ static int g_bHideTogglePrefix = 0;
 // same, for hiding from MQTT
 int g_doNotPublishChannels = 0;
 
+void CHANNEL_FreeLabels() {
+	for (int ch = 0; ch < CHANNEL_MAX; ch++) {
+		CMD_FreeLabels(); // free any enum labels
+		if (g_channelLabels[ch]) {
+			free(g_channelLabels[ch]);
+			g_channelLabels[ch] = 0;
+		}
+	}
+}
 void CHANNEL_SetLabel(int ch, const char *s, int bHideTogglePrefix) {
 	if (ch < 0)
 		return;
@@ -135,6 +145,24 @@ static commandResult_t CMD_SetChannel(const void *context, const char *cmd, cons
 
 	return CMD_RES_OK;
 }
+static commandResult_t CMD_SetFlash(const void *context, const char *cmd, const char *args, int cmdFlags) {
+	int ch, val;
+
+	Tokenizer_TokenizeString(args, 0);
+	// following check must be done after 'Tokenizer_TokenizeString',
+	// so we know arguments count in Tokenizer. 'cmd' argument is
+	// only for warning display
+	if (Tokenizer_CheckArgsCountAndPrintWarning(cmd, 2)) {
+		return CMD_RES_NOT_ENOUGH_ARGUMENTS;
+	}
+
+	ch = Tokenizer_GetArgInteger(0);
+	val = Tokenizer_GetArgInteger(1);
+
+	HAL_FlashVars_SaveChannel(ch, val);
+
+	return CMD_RES_OK;
+}
 static commandResult_t CMD_SetChannelFloat(const void* context, const char* cmd, const char* args, int cmdFlags) {
 	int ch;
 	float val;
@@ -240,7 +268,11 @@ static commandResult_t CMD_SetPinRole(const void *context, const char *cmd, cons
 		return CMD_RES_NOT_ENOUGH_ARGUMENTS;
 	}
 
-	pin = Tokenizer_GetArgInteger(0);
+	pin = Tokenizer_GetPin(0,-1);
+	if (pin==-1){
+		ADDLOG_INFO(LOG_FEATURE_CMD, "Unknown pin %s",Tokenizer_GetArg(0));
+		return CMD_RES_BAD_ARGUMENT;
+	}
 	role = Tokenizer_GetArg(1);
 
 	roleIndex = PIN_ParsePinRoleName(role);
@@ -409,16 +441,17 @@ static commandResult_t CMD_SetChannelPrivate(const void *context, const char *cm
 static commandResult_t CMD_GetReadings(const void *context, const char *cmd, const char *args, int cmdFlags){
 #ifdef ENABLE_DRIVER_BL0937
 	char tmp[96];
-	float v, c, p;
-    float e, elh;
+	float v, c, p, f;
+	float e, elh;
 
 	v = DRV_GetReading(OBK_VOLTAGE);
 	c = DRV_GetReading(OBK_CURRENT);
 	p = DRV_GetReading(OBK_POWER);
-    e = DRV_GetReading(OBK_CONSUMPTION_TOTAL);
-    elh = DRV_GetReading(OBK_CONSUMPTION_LAST_HOUR);
+	f = DRV_GetReading(OBK_FREQUENCY);
+	e = DRV_GetReading(OBK_CONSUMPTION_TOTAL);
+	elh = DRV_GetReading(OBK_CONSUMPTION_LAST_HOUR);
 
-	snprintf(tmp, sizeof(tmp), "%f %f %f %f %f",v,c,p,e,elh);
+	snprintf(tmp, sizeof(tmp), "%f %f %f %f %f %f",v,c,p,f,e,elh);
 
 	if(cmdFlags & COMMAND_FLAG_SOURCE_TCP) {
 		ADDLOG_INFO(LOG_FEATURE_RAW, tmp);
@@ -500,6 +533,11 @@ void CMD_InitChannelCommands(){
 	//cmddetail:"fn":"CMD_SetChannel","file":"cmnds/cmd_channels.c","requires":"",
 	//cmddetail:"examples":""}
     CMD_RegisterCommand("SetChannel", CMD_SetChannel, NULL);
+	//cmddetail:{"name":"SetFlash","args":"[FlashIndex][FlashValue]",
+	//cmddetail:"descr":"Sets a a flashVars channel directly (if you are using remember state for given channel, it will overwrite, it uses same space for channels memory).",
+	//cmddetail:"fn":"CMD_SetFlash","file":"cmnds/cmd_channels.c","requires":"",
+	//cmddetail:"examples":""}
+	CMD_RegisterCommand("SetFlash", CMD_SetFlash, NULL);
 	//cmddetail:{"name":"SetChannelFloat","args":"[ChannelIndex][ChannelValue]",
 	//cmddetail:"descr":"Sets a raw channel to given float value. Currently only used for LED PWM channels.",
 	//cmddetail:"fn":"CMD_SetChannelFloat","file":"cmnds/cmd_channels.c","requires":"",
@@ -541,7 +579,7 @@ void CMD_InitChannelCommands(){
 	//cmddetail:"examples":""}
     CMD_RegisterCommand("GetReadings", CMD_GetReadings, NULL);
 	//cmddetail:{"name":"ShortName","args":"[Name]",
-	//cmddetail:"descr":"Sets the short name of the device.",
+	//cmddetail:"descr":"Sets the short name of the device. This is used as topic for MQTT, for example, for cmnd/obk123121/power etc MQTT calls",
 	//cmddetail:"fn":"CMD_ShortName","file":"cmnds/cmd_channels.c","requires":"",
 	//cmddetail:"examples":""}
     CMD_RegisterCommand("ShortName", CMD_ShortName, NULL);
@@ -560,13 +598,11 @@ void CMD_InitChannelCommands(){
 	//cmddetail:"fn":"CMD_FullBootTime","file":"cmnds/cmd_channels.c","requires":"",
 	//cmddetail:"examples":""}
 	CMD_RegisterCommand("FullBootTime", CMD_FullBootTime, NULL);
-	//cmddetail:{"name":"SetChannelEnum","args":"[ChannelIndex][Value,Title][Value,Title]",
-	//cmddetail:"descr":"Creates a custom channel enumeration.",
-	//cmddetail:"fn":"SetChannelEnum","file":"cmnds/cmd_channels.c","requires":"",
+	//cmddetail:{"name":"SetChannelEnum","args":"[ChannelIndex][Value:Title][Value:Title]",
+	//cmddetail:"descr":"Creates a channel enumeration type.  Channel type must be set to Enum or ReadOnlyEnum. e.g. SetChannelEnum 1:One \"2:Enum Two\" 5:Five",
+	//cmddetail:"fn":"CMD_SetChannelEnum","file":"cmnds/cmd_channels.c","requires":"",
 	//cmddetail:"examples":""}
-#if WINDOWS
-	//CMD_RegisterCommand("SetChannelEnum", CMD_SetChannelEnum, NULL);
-#endif
+	CMD_RegisterCommand("SetChannelEnum", CMD_SetChannelEnum, NULL);
 	//cmddetail:{"name":"SetChannelLabel","args":"[ChannelIndex][Str][bHideTogglePrefix]",
 	//cmddetail:"descr":"Sets a channel label for UI and default entity name for Home Assistant discovery. If you use 1 for bHideTogglePrefix, then the 'Toggle ' prefix from UI button will be omitted",
 	//cmddetail:"fn":"CMD_SetChannelLabel","file":"cmnds/cmd_channels.c","requires":"",
@@ -589,7 +625,7 @@ void CMD_InitChannelCommands(){
 	CMD_RegisterCommand("SetChannelVisible", CMD_SetChannelVisible, NULL);
 	//cmddetail:{"name":"SetChannelPrivate","args":"[ChannelIndex][bPrivate]",
 	//cmddetail:"descr":"Channels marked as private are NEVER published via MQTT and excluded from Home Assistant discovery",
-	//cmddetail:"fn":"NULL);","file":"cmnds/cmd_channels.c","requires":"",
+	//cmddetail:"fn":"CMD_SetChannelPrivate","file":"cmnds/cmd_channels.c","requires":"",
 	//cmddetail:"examples":""}
 	CMD_RegisterCommand("SetChannelPrivate", CMD_SetChannelPrivate, NULL);
 	//cmddetail:{"name":"Ch","args":"[InputValue]",
