@@ -1420,22 +1420,6 @@ static driver_t g_drivers[] = {
 	false,                                   // loaded
 	},
 #endif
-#if ENABLE_DRIVER_ROOMBA
-	//drvdetail:{"name":"Roomba",
-	//drvdetail:"title":"Roomba OI Driver",
-	//drvdetail:"descr":"Driver for iRobot Roomba vacuum cleaners using the Open Interface (OI) protocol. Supports sensor reading and control commands via UART. Compatible with Roomba 500/600/700/800/900 series.",
-	//drvdetail:"requires":""}
-	{ "Roomba",                              // Driver Name
-	Roomba_Init,                             // Init
-	Roomba_RunEverySecond,                   // onEverySecond
-	Roomba_AppendInformationToHTTPIndexPage, // appendInformationToHTTPIndexPage
-	Roomba_OnQuickTick,                      // runQuickTick
-	NULL,                                    // stopFunction
-	NULL,                                    // onChannelChanged
-	Roomba_OnHassDiscovery,                  // onHassDiscovery
-	false,                                   // loaded
-	},
-#endif
 	//{ "", NULL, NULL, NULL, NULL, NULL, NULL, NULL, false },
 };
 
@@ -1692,10 +1676,6 @@ void DRV_AppendInformationToHTTPIndexPage(http_request_t* request, int bPreState
 			c_active++;
 			if (g_drivers[i].appendInformationToHTTPIndexPage) {
 				g_drivers[i].appendInformationToHTTPIndexPage(request, bPreState);
-			}
-			// FORCE Roomba Display (Debug Hack to bypass potential NULL pointer)
-			if (!stricmp(g_drivers[i].name, "Roomba")) {
-				Roomba_AppendInformationToHTTPIndexPage(request, bPreState);
 			}
 		}
 	}

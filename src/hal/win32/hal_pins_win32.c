@@ -38,7 +38,6 @@ static int adcToGpio[] = {
 };
 static int c_adcToGpio = sizeof(adcToGpio)/sizeof(adcToGpio[0]);
 
-
 static int gpioToAdc(int gpio) {
 	int i;
 	for (i = 0; i < c_adcToGpio; i++) {
@@ -174,6 +173,16 @@ const char *HAL_PIN_GetPinNameAlias(int index) {
 		return "RXD1";
 	if (index == 11)
 		return "TXD1";
+/*
+//######################### START TESTING PIN_Find only #########################
+	if (index == 13)
+		return "IO13/Test13/RRX13 XX13 15T";
+	if (index == 15)
+		return "IO15 151 X13(RX13)";
+	if (index == 14)
+		return "IO14 Test14 (X14/RX14/XX14)";
+//#########################' END TESTING PIN_Find only #'########################
+*/
 	return "N/A";
 }
 
@@ -208,7 +217,7 @@ void HAL_PIN_Setup_Output(int index) {
 void HAL_PIN_PWM_Stop(int pinIndex) {
 }
 
-void HAL_PIN_PWM_Start(int index) {
+void HAL_PIN_PWM_Start(int index, int freq) {
 	g_pinModes[index] = SIM_PIN_PWM;
 }
 void HAL_PIN_PWM_Update(int index, float value) {
@@ -222,6 +231,14 @@ void HAL_PIN_PWM_Update(int index, float value) {
 unsigned int HAL_GetGPIOPin(int index) {
 	return index;
 }
+
+void HAL_AttachInterrupt(int pinIndex, OBKInterruptType mode, OBKInterruptHandler function) {
+
+}
+void HAL_DetachInterrupt(int pinIndex) {
+
+}
+
 
 #endif
 
