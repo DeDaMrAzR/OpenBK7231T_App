@@ -33,7 +33,14 @@ fi
 
 
 # Smart Sync Strategy
-if [ ! -d "$BUILD_DIR/sdk" ]; then
+# CLEAN_BUILD=1 means we must refresh SDK content too, otherwise stale/corrupted
+# SDK files in the persistent build volume can survive indefinitely.
+if [ "$CLEAN_BUILD" = "1" ]; then
+    echo "Clean build requested: full sync of source to build volume (including SDKs)..."
+    rsync -rltD --no-owner --no-group --info=progress2 \
+        --exclude 'docker/test_runs/' \
+        "$SOURCE_DIR/" "$BUILD_DIR/" || true
+elif [ ! -d "$BUILD_DIR/sdk" ]; then
     echo "Initial setup: Full sync of source to build volume..."
     # First run: Sync everything including SDKs
     rsync -rltD --no-owner --no-group --info=progress2 \
