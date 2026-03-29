@@ -264,7 +264,6 @@ void Ariston_OnEverySecond(void);
 void Ariston_AppendInformationToHTTPIndexPage(http_request_t *request, int bPreState);
 void Ariston_RunFrame(void);
 void Ariston_OnHassDiscovery(const char *topic);
-bool Ariston_SetIdentityFromStrings(const char *macStr, const char *snStr);
 
 void DRV_DDPSend_Init();
 void DRV_DDPSend_Shutdown();

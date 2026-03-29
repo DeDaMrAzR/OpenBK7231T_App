@@ -2087,6 +2087,15 @@ static commandResult_t Cmd_Ariston_Discovery(const void *context, const char *cm
 // Driver init
 // -------------------------------------------------------
 void Ariston_Init(void) {
+    if (Tokenizer_GetArgsCount() >= 3) {
+        if (!Ariston_SetIdentityFromStrings(Tokenizer_GetArg(1), Tokenizer_GetArg(2))) {
+            addLogAdv(LOG_WARN, LOG_FEATURE_DRV,
+                "Ariston: invalid startup identity, driver will stay idle");
+        }
+    } else {
+        Ariston_ClearIdentity();
+    }
+
     Ariston_ReinitUart();
 
     memset(&g_ctx, 0, sizeof(g_ctx));

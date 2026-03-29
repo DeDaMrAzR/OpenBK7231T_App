@@ -1723,7 +1723,6 @@ void DRV_StartDriver(const char* name) {
 // startDriver BL0942
 // startDriver BL0937
 static commandResult_t DRV_Start(const void* context, const char* cmd, const char* args, int cmdFlags) {
-	const char* drvName;
 	Tokenizer_TokenizeString(args, 0);
 	// following check must be done after 'Tokenizer_TokenizeString',
 	// so we know arguments count in Tokenizer. 'cmd' argument is
@@ -1731,25 +1730,7 @@ static commandResult_t DRV_Start(const void* context, const char* cmd, const cha
 	if (Tokenizer_CheckArgsCountAndPrintWarning(cmd, 1)) {
 		return CMD_RES_NOT_ENOUGH_ARGUMENTS;
 	}
-
-	drvName = Tokenizer_GetArg(0);
-
-#if ENABLE_DRIVER_ARISTON
-	if (!stricmp(drvName, "Ariston")) {
-		if (Tokenizer_GetArgsCount() < 3) {
-			addLogAdv(LOG_WARN, LOG_FEATURE_MAIN,
-				"Ariston: startDriver usage is 'startDriver Ariston <MAC> <SN>'");
-			return CMD_RES_BAD_ARGUMENT;
-		}
-		if (!Ariston_SetIdentityFromStrings(Tokenizer_GetArg(1), Tokenizer_GetArg(2))) {
-			addLogAdv(LOG_WARN, LOG_FEATURE_MAIN,
-				"Ariston: invalid startup identity, driver not started");
-			return CMD_RES_BAD_ARGUMENT;
-		}
-	}
-#endif
-
-	DRV_StartDriver(drvName);
+	DRV_StartDriver(Tokenizer_GetArg(0));
 	return CMD_RES_OK;
 }
 static commandResult_t DRV_Stop(const void* context, const char* cmd, const char* args, int cmdFlags) {
