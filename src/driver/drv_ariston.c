@@ -2177,11 +2177,11 @@ void Ariston_AppendInformationToHTTPIndexPage(http_request_t *request, int bPreS
     const char *pwrCmd = (g_power_state == ARISTON_PWR_ON || g_power_state == ARISTON_PWR_BOOST) ? "ariston_power 0" : "ariston_power 1";
     const char *pwrLbl = (g_power_state == ARISTON_PWR_ON || g_power_state == ARISTON_PWR_BOOST) ? "Power OFF" : "Power ON";
     const char *modeCmd = (g_mode_state == 1) ? "ariston_mode eco" : "ariston_mode manual";
-    const char *modeLbl = (g_mode_state == 1) ? "Set ECO" : "Set Manual";
+    const char *modeLbl = (g_mode_state == 1) ? "ECO Mode OFF" : "ECO Mode ON";
     const char *antiCmd = (g_anti_legionella == 1) ? "ariston_antiLegionella 0" : "ariston_antiLegionella 1";
-    const char *antiLbl = (g_anti_legionella == 1) ? "Anti-Leg OFF" : "Anti-Leg ON";
+    const char *antiLbl = (g_anti_legionella == 1) ? "Anti-Legionella OFF" : "Anti-Legionella ON";
     const char *boostCmd = (g_boost_state == 1) ? "ariston_boost 0" : "ariston_boost 1";
-    const char *boostLbl = (g_boost_state == 1) ? "Boost OFF" : "Boost ON";
+    const char *boostLbl = (g_boost_state == 1) ? "Boost Mode OFF" : "Boost Mode ON";
     const char *powerStateStr;
     const char *modeStateStr;
     const char *boostStateStr;
@@ -2229,9 +2229,9 @@ void Ariston_AppendInformationToHTTPIndexPage(http_request_t *request, int bPreS
     poststr(request, "</tr></table></td>");
     poststr(request, "</tr>");
     poststr(request, "<tr>");
+    hprintf255(request, "<td style='width:33%%'><button type='button' class='btn' style='width:100%%' onclick=\"return aristonSend('%s')\">%s</button></td>", boostCmd, boostLbl);
     hprintf255(request, "<td style='width:33%%'><button type='button' class='btn' style='width:100%%' onclick=\"return aristonSend('%s')\">%s</button></td>", modeCmd, modeLbl);
-    hprintf255(request, "<td style='width:33%%'><button type='button' class='btn' style='width:100%%' onclick=\"return aristonSend('%s')\">%s</button></td>", antiCmd, antiLbl);
-    hprintf255(request, "<td style='width:34%%'><button type='button' class='btn' style='width:100%%' onclick=\"return aristonSend('%s')\">%s</button></td>", boostCmd, boostLbl);
+    hprintf255(request, "<td style='width:34%%'><button type='button' class='btn' style='width:100%%' onclick=\"return aristonSend('%s')\">%s</button></td>", antiCmd, antiLbl);
     poststr(request, "</tr>");
     poststr(request, "</table><hr>");
 
