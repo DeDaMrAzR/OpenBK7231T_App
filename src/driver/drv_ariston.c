@@ -2174,17 +2174,18 @@ void Ariston_AppendInformationToHTTPIndexPage(http_request_t *request, int bPreS
         "</script>"
     );
 
-    const char *pwrCmd = (g_power_state == ARISTON_PWR_ON || g_power_state == ARISTON_PWR_BOOST) ? "ariston_power 0" : "ariston_power 1";
-    const char *pwrLbl = (g_power_state == ARISTON_PWR_ON || g_power_state == ARISTON_PWR_BOOST) ? "Power OFF" : "Power ON";
-    const char *modeCmd = (g_mode_state == 1) ? "ariston_mode eco" : "ariston_mode manual";
-    const char *modeLbl = (g_mode_state == 1) ? "ECO Mode OFF" : "ECO Mode ON";
-    const char *antiCmd = (g_anti_legionella == 1) ? "ariston_antiLegionella 0" : "ariston_antiLegionella 1";
-    const char *antiLbl = (g_anti_legionella == 1) ? "Anti-Legionella OFF" : "Anti-Legionella ON";
-    const char *boostCmd = (g_boost_state == 1) ? "ariston_boost 0" : "ariston_boost 1";
-    const char *boostLbl = (g_boost_state == 1) ? "Boost Mode OFF" : "Boost Mode ON";
+    const char *pwrCmd;
+    const char *pwrLbl;
+    const char *modeCmd;
+    const char *modeLbl;
+    const char *antiCmd;
+    const char *antiLbl;
+    const char *boostCmd;
+    const char *boostLbl;
     const char *powerStateStr;
     const char *modeStateStr;
     const char *boostStateStr;
+    const char *antiLegStateStr;
     const char *heaterStateStr;
     const char *clockSrcStr = "unknown";
     const char *weekdayStr = "Unknown";
@@ -2205,7 +2206,16 @@ void Ariston_AppendInformationToHTTPIndexPage(http_request_t *request, int bPreS
     powerStateStr = Ariston_GetPowerStateString();
     modeStateStr = Ariston_GetModeStateString();
     boostStateStr = Ariston_GetBoostStateString();
+    antiLegStateStr = Ariston_GetAntiLegionellaString();
     heaterStateStr = Ariston_GetHeaterActivityString();
+    pwrCmd = (g_power_state == ARISTON_PWR_ON || g_power_state == ARISTON_PWR_BOOST) ? "ariston_power 0" : "ariston_power 1";
+    pwrLbl = (g_power_state == ARISTON_PWR_ON || g_power_state == ARISTON_PWR_BOOST) ? "Power OFF" : "Power ON";
+    modeCmd = (!strcmp(modeStateStr, "ECO")) ? "ariston_mode manual" : "ariston_mode eco";
+    modeLbl = (!strcmp(modeStateStr, "ECO")) ? "ECO Mode OFF" : "ECO Mode ON";
+    antiCmd = (!strcmp(antiLegStateStr, "ON")) ? "ariston_antiLegionella 0" : "ariston_antiLegionella 1";
+    antiLbl = (!strcmp(antiLegStateStr, "ON")) ? "Anti-Legionella OFF" : "Anti-Legionella ON";
+    boostCmd = (!strcmp(boostStateStr, "ON")) ? "ariston_boost 0" : "ariston_boost 1";
+    boostLbl = (!strcmp(boostStateStr, "ON")) ? "Boost Mode OFF" : "Boost Mode ON";
     if (g_ctx.clock_has_status3 && hourFresh &&
         g_ctx.clock_year2 >= 0 && g_ctx.clock_year2 <= 99 &&
         g_ctx.clock_month >= 1 && g_ctx.clock_month <= 12 &&
@@ -2251,7 +2261,7 @@ void Ariston_AppendInformationToHTTPIndexPage(http_request_t *request, int bPreS
     hprintf255(request, "<tr><td><b>Power State</b></td><td style='text-align:right;'>%s</td></tr>", powerStateStr);
     hprintf255(request, "<tr><td><b>Mode</b></td><td style='text-align:right;'>%s</td></tr>", modeStateStr);
     hprintf255(request, "<tr><td><b>Boost</b></td><td style='text-align:right;'>%s</td></tr>", boostStateStr);
-    hprintf255(request, "<tr><td><b>Anti-Legionella</b></td><td style='text-align:right;'>%s</td></tr>", Ariston_GetAntiLegionellaString());
+    hprintf255(request, "<tr><td><b>Anti-Legionella</b></td><td style='text-align:right;'>%s</td></tr>", antiLegStateStr);
     hprintf255(request, "<tr><td><b>Energy Today</b></td><td style='text-align:right;'>%.2f Wh</td></tr>", g_energy_today_wh);
     hprintf255(request, "<tr><td><b>Energy Est (Session)</b></td><td style='text-align:right;'>%.2f Wh</td></tr>", g_energy_session_wh);
     hprintf255(request, "<tr><td><b>Energy Est (Total)</b></td><td style='text-align:right;'>%.2f Wh</td></tr>", g_energy_total_wh);
