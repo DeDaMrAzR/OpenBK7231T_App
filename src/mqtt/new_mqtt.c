@@ -2366,11 +2366,12 @@ int MQTT_RunEverySecondUpdate()
 							break;
 						}
 					}
-					// OBK_PUBLISH_MUTEX_FAIL - MQTT is busy
+					// Stop on transient failures instead of hammering every remaining item.
 					if (publishRes == OBK_PUBLISH_MUTEX_FAIL
-						|| publishRes == OBK_PUBLISH_WAS_DISCONNECTED)
+						|| publishRes == OBK_PUBLISH_WAS_DISCONNECTED
+						|| publishRes == OBK_PUBLISH_MEM_FAIL)
 					{
-						// retry the same later
+						// Leave this item pending while MQTT has time to drain its queue.
 						break;
 					}
 					// OBK_PUBLISH_WAS_NOT_REQUIRED
