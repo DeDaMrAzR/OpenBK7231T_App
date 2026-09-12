@@ -1,3 +1,5 @@
+# WARNING THIS IS A SANDBOX FORK FOR ME TO PLAY WITH!!!
+
 # Introduction
 
 OpenBK7231T/OpenBeken is a Tasmota/ESPHome alternative for modern Tuya-based modules, offering MQTT and Home Assistant compatibility.
